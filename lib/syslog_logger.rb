@@ -77,7 +77,7 @@ class SyslogLogger
   ##
   # The version of SyslogLogger you are using.
 
-  VERSION = '1.4.1'
+  VERSION = '1.4.2pre'
 
   ##
   # Maps Logger warning types to syslog(3) warning types.
