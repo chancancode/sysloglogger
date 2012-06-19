@@ -119,10 +119,8 @@ class SyslogLogger
 
   def self.make_methods(meth)
     eval <<-EOM, nil, __FILE__, __LINE__ + 1
-      def #{meth}(message = nil)
-        return true if #{LOGGER_LEVEL_MAP[meth]} < @level
-        SYSLOG.#{LOGGER_MAP[meth]} clean(message || yield)
-        return true
+      def #{meth}(progname = nil, &block)
+        add(Logger::#{meth.upcase}, nil, progname, &block)
       end
 
       def #{meth}?
@@ -196,7 +194,16 @@ class SyslogLogger
   def add(severity, message = nil, progname = nil, &block)
     severity ||= Logger::UNKNOWN
     return true if severity < @level
-    SYSLOG.send LEVEL_LOGGER_MAP[severity], clean(message || block.call)
+
+    if message.nil?
+      if block_given?
+        message = yield
+      else
+        message = progname
+      end
+    end
+
+    SYSLOG.send LEVEL_LOGGER_MAP[severity], clean(message)
     return true
   end
 
